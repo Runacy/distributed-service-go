@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/Runacy/distributed-service-go/proglog/internal/server"
+	"github.com/Runacy/distributed-service-go/proglog/sample-http-server/internal/server"
 )
 
 func main() {
