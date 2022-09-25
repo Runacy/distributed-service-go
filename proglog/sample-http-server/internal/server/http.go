@@ -3,6 +3,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -58,14 +59,20 @@ func (s *httpServer) handleProduce(w http.ResponseWriter, r *http.Request) {
 	//リクエストを構造体をアンマーシャル(*1)する
 	// *1 JSON形式で受け取った値を指定したポインタに保存
 	var req ProduceRequest
+	fmt.Println("r.Body", r.Body)
+	// データがrfc準きょかどうかかなあ
+	// 自分で定義したものの場合は、json.Unmarshalを使うっぽい。
+	// こっちは、[]byteだから自分が定義したrfc準きょでないものも使えそう
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
+		fmt.Println("64行目", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	// その構造体を使って、ログにレコードを保存し、ログがレコードを保存したオフセットを取得
 	off, err := s.Log.Append(req.Record) // offが保存した時のindex
 	if err != nil {
+		fmt.Println("71行目", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -73,6 +80,7 @@ func (s *httpServer) handleProduce(w http.ResponseWriter, r *http.Request) {
 	res := ProduceResponse{Offset: off}
 	err = json.NewEncoder(w).Encode(res)
 	if err != nil {
+		fmt.Println("79行目", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
